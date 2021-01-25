@@ -104,9 +104,15 @@ instance Read Bit where
 
 instance U.Unbox Bit
 
--- Ints are offset and length in bits
-data instance U.MVector s Bit = BitMVec !Int !Int !(MutableByteArray s)
-data instance U.Vector    Bit = BitVec  !Int !Int !ByteArray
+data instance U.MVector s Bit = BitMVec
+  !Int                  -- ^ offset in bits
+  !Int                  -- ^ length in bits
+  !(MutableByteArray s) -- ^ underlying byte array
+
+data instance U.Vector Bit = BitVec
+  !Int       -- ^ offset in bits
+  !Int       -- ^ length in bits
+  !ByteArray -- ^ underlying byte array
 
 readBit :: Int -> Word -> Bit
 readBit i w = Bit (w .&. (1 `unsafeShiftL` i) /= 0)
