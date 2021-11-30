@@ -1,3 +1,7 @@
+# 1.1.2.0
+
+* Fix `setBit`, `clearBit`, `complementBit` to preserve vector's length.
+
 # 1.1.1.0
 
 * Export `BitVec` and `BitMVec` constructors.
