@@ -37,6 +37,8 @@ module Data.Bit.ImmutableTS
   , listBits
   ) where
 
+#include "MachDeps.h"
+
 import Control.Monad
 import Control.Monad.ST
 import Data.Bits
@@ -184,13 +186,25 @@ cloneToWords v = runST $ do
 -- | Cast a unboxed vector of 'Word8'
 -- to an unboxed vector of bits.
 --
+-- For unaligned vectors on big-endian architectures 'castFromWords8'
+-- resorts to instead of casting underlying arrays.
+--
 -- >>> :set -XOverloadedLists
 -- >>> castFromWords8 [123]
 -- [1,1,0,1,1,1,1,0]
 castFromWords8 :: U.Vector Word8 -> U.Vector Bit
 castFromWords8 ws = BitVec (off `shiftL` 3) (len `shiftL` 3) arr
   where
+#ifdef WORDS_BIGENDIAN
+    P.Vector off' len arr' = unsafeCoerce ws
+    (off, arr)
+      | aligned (off' `shiftL` 3), aligned (len `shiftL` 3)
+      = (off', arr')
+      | otherwise
+      = (0, let P.Vector _ _ ar = P.convert ws in ar)
+#else
     P.Vector off len arr = unsafeCoerce ws
+#endif
 
 -- | Try to cast an unboxed vector of bits
 -- to an unboxed vector of 'Word8'.
@@ -200,8 +214,12 @@ castFromWords8 ws = BitVec (off `shiftL` 3) (len `shiftL` 3) arr
 -- > castToWords8 (castFromWords8 v) == Just v
 castToWords8 :: U.Vector Bit -> Maybe (U.Vector Word8)
 castToWords8 (BitVec s n ws)
-  | s .&. 7 == 0, n .&. 7 == 0 =
-    Just $ unsafeCoerce $ P.Vector (s `shiftR` 3) (n `shiftR` 3) ws
+#ifdef WORDS_BIGENDIAN
+  | aligned s, aligned n
+#else
+  | s .&. 7 == 0, n .&. 7 == 0
+#endif
+  = Just $ unsafeCoerce $ P.Vector (s `shiftR` 3) (n `shiftR` 3) ws
   | otherwise = Nothing
 
 -- | Clone an unboxed vector of bits

@@ -83,11 +83,13 @@ cloneToWords8M
   -> m (MVector (PrimState m) Word8)
 cloneToWords8M v = do
   let lenBits  = MU.length v
-      lenWords = (lenBits + 7) `shiftR` 3
-  w@(BitMVec _ _ arr) <- MU.unsafeNew (lenWords `shiftL` 3)
+      -- Take care about big-endian architectures: allocate full words!
+      actualLenBytes = (lenBits + 7) `shiftR` 3
+      roundedLenBytes = wordsToBytes (nWords lenBits)
+  w@(BitMVec _ _ arr) <- MU.unsafeNew (roundedLenBytes `shiftL` 3)
   MU.unsafeCopy (MU.slice 0 lenBits w) v
-  MU.set (MU.slice lenBits (lenWords `shiftL` 3 - lenBits) w) (Bit False)
-  pure $ MU.MV_Word8 $ P.MVector 0 lenWords arr
+  MU.set (MU.slice lenBits (roundedLenBytes `shiftL` 3 - lenBits) w) (Bit False)
+  pure $ MU.MV_Word8 $ P.MVector 0 actualLenBytes arr
 {-# INLINE cloneToWords8M #-}
 
 -- | Zip two vectors with the given function.
