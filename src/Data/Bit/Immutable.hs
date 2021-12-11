@@ -225,14 +225,14 @@ castFromWords8 ws = BitVec (off `shiftL` 3) (len `shiftL` 3) arr
 --
 -- > castToWords8 (castFromWords8 v) == Just v
 castToWords8 :: U.Vector Bit -> Maybe (U.Vector Word8)
-castToWords8 (BitVec s n ws)
 #ifdef WORDS_BIGENDIAN
-  | aligned s, aligned n
+castToWords8 = const Nothing
 #else
+castToWords8 (BitVec s n ws)
   | s .&. 7 == 0, n .&. 7 == 0
-#endif
   = Just $ unsafeCoerce $ P.Vector (s `shiftR` 3) (n `shiftR` 3) ws
   | otherwise = Nothing
+#endif
 
 -- | Clone an unboxed vector of bits
 -- to a new unboxed vector of 'Word8'.
