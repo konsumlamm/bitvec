@@ -2,6 +2,7 @@
 
 {-# LANGUAGE BangPatterns         #-}
 {-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE MagicHash            #-}
 {-# LANGUAGE RankNTypes           #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TupleSections        #-}
@@ -63,6 +64,10 @@ import qualified Data.Vector.Unboxed as U
 import qualified Data.Vector.Unboxed.Mutable as MU
 import Data.Word
 import Unsafe.Coerce
+
+#ifdef WORDS_BIGENDIAN
+import GHC.Exts
+#endif
 
 #if UseLibGmp
 gmpLimbShift :: Int
@@ -188,7 +193,7 @@ cloneToWords v = runST $ do
 -- to an unboxed vector of bits.
 --
 -- For unaligned vectors on big-endian architectures 'castFromWords8'
--- resorts to instead of casting underlying arrays.
+-- resorts to copying instead of casting underlying arrays.
 --
 -- >>> :set -XOverloadedLists
 -- >>> castFromWords8 [123]
@@ -201,10 +206,13 @@ castFromWords8 ws = BitVec (off `shiftL` 3) (len `shiftL` 3) arr
     (off, arr)
       | aligned (off' `shiftL` 3), aligned (len `shiftL` 3) = (off', arr')
       | otherwise = (0,) $ runST $ do
-        let len' = wordsToBytes $ nWords $ len `shiftL` 3
+        let lenWords = nWords $ len `shiftL` 3
+            len' = wordsToBytes lenWords
         marr <- newByteArray len'
         copyByteArray marr 0 arr' off' len
         fillByteArray marr len (len' - len) 0
+        W# lastWord <- readByteArray marr (lenWords - 1)
+        writeByteArray marr (lenWords - 1) (W# (byteSwap# lastWord))
         unsafeFreezeByteArray marr
 #else
     P.Vector off len arr = unsafeCoerce ws
