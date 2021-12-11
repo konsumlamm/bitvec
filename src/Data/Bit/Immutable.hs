@@ -192,8 +192,8 @@ cloneToWords v = runST $ do
 -- | Cast a unboxed vector of 'Word8'
 -- to an unboxed vector of bits.
 --
--- For unaligned vectors on big-endian architectures 'castFromWords8'
--- resorts to copying instead of casting underlying arrays.
+-- On big-endian architectures 'castFromWords8'
+-- resorts to copying instead of aliasing underlying arrays.
 --
 -- >>> :set -XOverloadedLists
 -- >>> castFromWords8 [123]
@@ -203,17 +203,17 @@ castFromWords8 ws = BitVec (off `shiftL` 3) (len `shiftL` 3) arr
   where
 #ifdef WORDS_BIGENDIAN
     P.Vector off' len arr' = unsafeCoerce ws
-    (off, arr)
-      | aligned (off' `shiftL` 3), aligned (len `shiftL` 3) = (off', arr')
-      | otherwise = (0,) $ runST $ do
-        let lenWords = nWords $ len `shiftL` 3
-            len' = wordsToBytes lenWords
-        marr <- newByteArray len'
-        copyByteArray marr 0 arr' off' len
-        fillByteArray marr len (len' - len) 0
-        W# lastWord <- readByteArray marr (lenWords - 1)
-        writeByteArray marr (lenWords - 1) (W# (byteSwap# lastWord))
-        unsafeFreezeByteArray marr
+    off = 0
+    arr = runST $ do
+      let lenWords = nWords $ len `shiftL` 3
+          len' = wordsToBytes lenWords
+      marr <- newByteArray len'
+      copyByteArray marr 0 arr' off' len
+      fillByteArray marr len (len' - len) 0
+      forM_ [0..lenWords - 1] $ \i -> do
+        W# w <- readByteArray marr i
+        writeByteArray marr i (W# (byteSwap# w))
+      unsafeFreezeByteArray marr
 #else
     P.Vector off len arr = unsafeCoerce ws
 #endif
