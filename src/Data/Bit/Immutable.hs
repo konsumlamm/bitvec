@@ -4,6 +4,7 @@
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE RankNTypes           #-}
 {-# LANGUAGE FlexibleInstances    #-}
+{-# LANGUAGE TupleSections        #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -198,10 +199,13 @@ castFromWords8 ws = BitVec (off `shiftL` 3) (len `shiftL` 3) arr
 #ifdef WORDS_BIGENDIAN
     P.Vector off' len arr' = unsafeCoerce ws
     (off, arr)
-      | aligned (off' `shiftL` 3), aligned (len `shiftL` 3)
-      = (off', arr')
-      | otherwise
-      = (0, let P.Vector _ _ ar = P.convert ws in ar)
+      | aligned (off' `shiftL` 3), aligned (len `shiftL` 3) = (off', arr')
+      | otherwise = (0,) $ runST $ do
+        let len' = wordsToBytes $ nWords $ len `shiftL` 3
+        marr <- newByteArray len'
+        copyByteArray marr 0 arr' off' len
+        fillByteArray marr len (len' - len) 0
+        unsafeFreezeByteArray marr
 #else
     P.Vector off len arr = unsafeCoerce ws
 #endif
