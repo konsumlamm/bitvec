@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module Tests.Vector
   ( vectorTests
   ) where
@@ -15,6 +17,8 @@ import Data.Word
 import Test.Tasty
 import Test.Tasty.QuickCheck (Property, NonNegative(..), Positive(..), testProperty, Large(..), (===), property, once, (==>), ioProperty, (.&&.), counterexample)
 import Unsafe.Coerce
+
+#include "MachDeps.h"
 
 vectorTests :: TestTree
 vectorTests = testGroup "Data.Vector.Unboxed.Bit"
@@ -154,11 +158,15 @@ prop_cloneToWords8_def xs@(BitVec off len _)
       (w, bs') -> w : loop bs'
 
 prop_castToWords8_1 :: U.Vector Word8 -> Property
+#ifdef WORDS_BIGENDIAN
+prop_castToWords8_1 ws = Nothing === castToWords8 (castFromWords8 ws)
+#else
 prop_castToWords8_1 ws
   = counterexample ("offset = " ++ show off ++ " len = " ++ show len)
   $ Just ws === castToWords8 (castFromWords8 ws)
   where
     P.Vector off len _ = unsafeCoerce ws
+#endif
 
 prop_castToWords8_2 :: U.Vector Bit -> Property
 prop_castToWords8_2 xs = case castToWords8 xs of
