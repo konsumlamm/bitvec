@@ -168,11 +168,7 @@ static void reverse_bits_avx(uint32_t *dest, const uint32_t *src, HsInt len) {
 
 void _hs_bitvec_reverse_bits(uint32_t *dest, const uint32_t *src, HsInt len) {
 #ifdef __x86_64__
-    if (__builtin_cpu_supports("avx2")) {
-        reverse_bits_avx(dest, src, len);
-    } else {
-        reverse_bits_sse(dest, src, len);
-    }
+    reverse_bits_sse(dest, src, len);
 #else
     for (size_t i = 0; i < len; i++) {
         uint32_t x = src[i];
