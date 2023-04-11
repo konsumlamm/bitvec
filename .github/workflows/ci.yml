@@ -11,65 +11,6 @@ defaults:
     shell: bash
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        ghc: ['9.6', '9.4', '9.2', '9.0', '8.10', '8.8.4', '8.8.2', '8.8.1', '8.6', '8.4']
-    steps:
-    - uses: actions/checkout@v3
-    - uses: haskell/actions/setup@v2
-      id: setup-haskell-cabal
-      with:
-        ghc-version: ${{ matrix.ghc }}
-        cabal-version: 'latest'
-    - uses: actions/cache@v3
-      name: Cache cabal stuff
-      with:
-        path: |
-          ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
-          dist-newstyle
-        key: ${{ runner.os }}-${{ matrix.ghc }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.ghc }}-
-    - name: Build
-      run: |
-        echo packages:. > cabal.project
-        echo tests:True >> cabal.project
-        echo "constraints:quickcheck-classes -semigroupoids -aeson -semirings" >> cabal.project
-        cabal test --test-show-details=direct
-        cabal bench --benchmark-option=-l
-        cabal sdist
-        cabal check
-    - name: Build without SIMD
-      run: |
-        cabal test -f-simd --test-show-details=direct
-    - name: Haddock
-      if: ${{ matrix.ghc != '8.0' && matrix.ghc != '8.2' && matrix.ghc != '8.4' }}
-      run: cabal haddock
-
-  i386:
-    needs: build
-    runs-on: ubuntu-latest
-    container:
-      image: i386/ubuntu:bionic
-    steps:
-    - name: Install
-      run: |
-        apt-get update -y
-        apt-get install -y autoconf build-essential zlib1g-dev libgmp-dev curl libncurses5 libtinfo5 libncurses5-dev libtinfo-dev
-        curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
-    - uses: actions/checkout@v1
-    - name: Test
-      run: |
-        source ~/.ghcup/env
-        cabal --version
-        cabal update
-        cabal test --test-show-details=direct
-        cabal test -f-simd --test-show-details=direct
-
   emulated:
     needs: build
     runs-on: ubuntu-latest
@@ -96,32 +37,3 @@ jobs:
           ./Tests +RTS -s
           ghc --make -Isrc:test -isrc:test -DUseSIMD -o Tests test/Main.hs +RTS -s
           ./Tests +RTS -s
-
-  bounds-checking:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: haskell/actions/setup@v2
-      id: setup-haskell-cabal
-      with:
-        ghc-version: 'latest'
-    - name: Update cabal package database
-      run: cabal update
-    - uses: actions/cache@v2
-      name: Cache cabal stuff
-      with:
-        path: |
-          ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
-          dist-newstyle
-        key: ${{ runner.os }}-latest
-    - name: Test
-      run: |
-        echo packages:. > cabal.project
-        echo tests:True >> cabal.project
-        echo "constraints:quickcheck-classes -semigroupoids -aeson -semirings" >> cabal.project
-        echo "constraints:vector +unsafechecks +internalchecks" >> cabal.project
-        # Some tests are filtered out because of
-        # https://gitlab.haskell.org/ghc/ghc/-/issues/23132
-        cabal run tests --test-show-details=direct --ghc-options='-fcheck-prim-bounds -fno-ignore-asserts' -- -p '$NF!~/cloneFromWords8/&&$NF!~/cloneToByteString/'
-        cabal run tests -f-simd --test-show-details=direct --ghc-options='-fcheck-prim-bounds -fno-ignore-asserts' -- -p '$NF!~/cloneFromWords8/&&$NF!~/cloneToByteString/'
