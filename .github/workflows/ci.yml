@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - ci-emulated
   pull_request: {}
 
 defaults:
@@ -92,6 +93,8 @@ jobs:
           echo "#define BOUNDS_CHECK(f) (\_ _ _ -> id)" > src/vector.h
           echo "#define UNSAFE_CHECK(f) (\_ _ _ -> id)" >> src/vector.h
           ghc --make -Isrc:test -isrc:test -o Tests test/Main.hs +RTS -s
+          ./Tests +RTS -s
+          ghc --make -Isrc:test -isrc:test -DUseSIMD -o Tests test/Main.hs +RTS -s
           ./Tests +RTS -s
 
   bounds-checking:
