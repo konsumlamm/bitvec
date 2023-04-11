@@ -32,6 +32,10 @@ module Data.Bit.ThreadSafe
   , U.Vector(BitVec)
   , U.MVector(BitMVec)
 
+#ifdef UseSIMD
+  , foo
+#endif
+
   , unsafeFlipBit
   , flipBit
 

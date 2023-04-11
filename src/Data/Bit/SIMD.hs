@@ -1,8 +1,10 @@
 {-# LANGUAGE MagicHash        #-}
 {-# LANGUAGE UnliftedFFITypes #-}
+{-# LANGUAGE DeriveLift       #-}
 
 module Data.Bit.SIMD
-  ( ompPopcount
+  ( Text(..)
+  , ompPopcount
   , ompCom
   , ompAnd
   , ompIor
@@ -20,6 +22,10 @@ import Control.Monad.ST.Unsafe
 import Data.Primitive.ByteArray
 import GHC.Exts
 import System.IO.Unsafe
+
+import Language.Haskell.TH.Syntax (Lift)
+
+data Text = Text String deriving Lift
 
 foreign import ccall unsafe "_hs_bitvec_popcount"
   omp_popcount :: ByteArray# -> Int# -> IO Int

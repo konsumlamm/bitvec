@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - windows-link
   pull_request: {}
 
 defaults:

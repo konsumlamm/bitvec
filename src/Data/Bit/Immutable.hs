@@ -7,6 +7,7 @@
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TupleSections        #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TemplateHaskell      #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -18,6 +19,10 @@ module Data.Bit.ImmutableTS
   ( castFromWords
   , castToWords
   , cloneToWords
+
+#ifdef UseSIMD
+  , foo
+#endif
 
   , castFromWords8
   , castToWords8
@@ -46,6 +51,7 @@ import Control.Monad.ST
 import Data.Bits
 #if UseSIMD
 import Data.Bit.SIMD
+import Language.Haskell.TH.Syntax (lift)
 #endif
 #ifndef BITVEC_THREADSAFE
 import Data.Bit.Internal
@@ -67,6 +73,11 @@ import Data.Word
 
 #ifdef WORDS_BIGENDIAN
 import GHC.Exts
+#endif
+
+#ifdef UseSIMD
+foo :: Text
+foo = $(lift (Text "foo"))
 #endif
 
 instance {-# OVERLAPPING #-} Bits (Vector Bit) where
