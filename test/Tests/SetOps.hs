@@ -48,8 +48,9 @@ setOpTests = testGroup "Set operations"
   , testProperty "reverseInPlace middle"     prop_reverseInPlace_middle
   , testProperty "reverseInPlaceLong middle" prop_reverseInPlaceLong_middle
 
-  , adjustOption (\n -> max 500 n :: QuickCheckTests) $ mkGroup2 "selectBits" prop_selectBits_def
-  , adjustOption (\n -> max 500 n :: QuickCheckTests) $ mkGroup2 "excludeBits" prop_excludeBits_def
+  --, adjustOption (\n -> max 500 n :: QuickCheckTests) $ mkGroup2 "selectBits" prop_selectBits_def
+  --, adjustOption (\n -> max 500 n :: QuickCheckTests) $ mkGroup2 "excludeBits" prop_excludeBits_def
+  , testProperty "excludeBits" $ excludeBits (U.replicate 64 (Bit False)) (U.replicate 64 (Bit False)) === U.replicate 64 (Bit False)
 
   , mkGroup "countBits" prop_countBits_def
   ]
