@@ -400,18 +400,23 @@ HsInt _hs_bitvec_select_bits(HsWord *dest, const HsWord *src, const HsWord *mask
     for (size_t i = 0; i < len; i++) {
         HsWord x = src[i];
         HsWord m = mask[i] ^ bit_mask;
-        printf("x = %llx, m = %llx\n", x, m);
 
         // pext
         HsWord y = 0;
-        HsWord bb = 1;
-        for (; m != 0; bb <<= 1) {
-            if (x & m & -m) {
-                y |= bb;
+        HsInt count = 0;
+        if (m == -1) {
+            y = x;
+            count = sizeof(HsWord) * 8;
+        } else {
+            HsWord bb = 1;
+            for (; m != 0; bb <<= 1) {
+                if (x & m & -m) {
+                    y |= bb;
+                }
+                m &= m - 1;
             }
-            m &= m - 1;
+            count = __builtin_ctzll(bb);
         }
-        printf("y = %llx, bb = %lli\n", y, bb);
 
         if (sizeof(HsWord) == 8) {
             // 64 bit
@@ -423,7 +428,7 @@ HsInt _hs_bitvec_select_bits(HsWord *dest, const HsWord *src, const HsWord *mask
                 dest[off_words] |= y << off_bits;
                 dest[off_words + 1] = y >> (64 - off_bits);
             }
-            off += __builtin_ctzll(bb);
+            off += count;
         } else {
             // 32 bit
             HsInt off_words = off >> 5;
@@ -434,7 +439,7 @@ HsInt _hs_bitvec_select_bits(HsWord *dest, const HsWord *src, const HsWord *mask
                 dest[off_words] |= y << off_bits;
                 dest[off_words + 1] = y >> (32 - off_bits);
             }
-            off += __builtin_ctzl(bb);
+            off += count;
         }
     }
     return off;
