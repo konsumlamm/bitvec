@@ -5,6 +5,8 @@
 #include <immintrin.h>
 #endif
 
+#include <stdio.h>
+
 #include "HsFFI.h"
 
 HsInt _hs_bitvec_popcount(const uint32_t *src, HsInt len) {
@@ -363,10 +365,12 @@ static HsInt select_bits_pext(uint64_t *dest, const uint64_t *src, const uint64_
     } else {
         bit_mask = 0;
     }
+    printf("bitmask: %lx\n", bit_mask);
     HsInt off = 0; // offset in bits into `dest`
     for (size_t i = 0; i < len; i++) {
         uint64_t x = src[i];
         uint64_t m = mask[i] ^ bit_mask;
+        printf("mask: %lx\n", m);
         HsInt count = _mm_popcnt_u64(m);
         uint64_t y = _pext_u64(x, m);
         HsInt off_words = off >> 6;
@@ -383,8 +387,12 @@ static HsInt select_bits_pext(uint64_t *dest, const uint64_t *src, const uint64_
 }
 
 HsInt _hs_bitvec_select_bits(HsWord *dest, const HsWord *src, const HsWord *mask, HsInt len, HsBool exclude) {
+    if (exclude) {
+        puts("excluding");
+    }
 #ifdef __x86_64__
     if (__builtin_cpu_supports("popcnt") && __builtin_cpu_supports("bmi2")) {
+        puts("x86_64");
         return select_bits_pext(dest, src, mask, len, exclude);
     }
 #endif
@@ -394,10 +402,12 @@ HsInt _hs_bitvec_select_bits(HsWord *dest, const HsWord *src, const HsWord *mask
     } else {
         bit_mask = 0;
     }
+    printf("bitmask: %lx\n", bit_mask);
     HsInt off = 0; // offset in bits into `dest`
     for (size_t i = 0; i < len; i++) {
         HsWord x = src[i];
         HsWord m = mask[i] ^ bit_mask;
+        printf("mask: %lx\n", m);
 
         // pext
         HsWord y = 0;
