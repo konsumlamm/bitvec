@@ -13,10 +13,14 @@ jobs:
       fail-fast: true
     steps:
     - uses: actions/checkout@v3
-    - name: Setup cross GHC
+    - name: Setup GHCup cross
       run: |
-        ghcup --version
         ghcup config add-release-channel https://raw.githubusercontent.com/haskell/ghcup-metadata/develop/ghcup-cross-0.0.8.yaml
-    - name: Build
+    - name: JS
       run: |
-        cabal build
+        ghcup install ghc javascript-unknown-ghcjs-9.6.2
+        javascript-unknown-ghcjs-ghc --help
+    - name: WASM
+      run: |
+        ghcup install ghc wasm32-wasi-9.8.0.20230927
+        wasm32-wasi-ghc --help
