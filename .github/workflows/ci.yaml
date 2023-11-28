@@ -23,7 +23,7 @@ jobs:
         source ./emsdk_env.sh
         cd ..
 
-        ghcup install --set ghc 9.6.2
+        ghcup install --set ghc 9.6.2 --verbose
         emconfigure ghcup install ghc --set javascript-unknown-ghcjs-9.6.2
         cabal build --with-compiler=javascript-unknown-ghcjs-ghc
     - name: WASM
