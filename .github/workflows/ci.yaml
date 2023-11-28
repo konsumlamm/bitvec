@@ -18,9 +18,23 @@ jobs:
         ghcup config add-release-channel https://raw.githubusercontent.com/haskell/ghcup-metadata/develop/ghcup-cross-0.0.8.yaml
     - name: JS
       run: |
-        ghcup install ghc javascript-unknown-ghcjs-9.6.2
+        git clone https://github.com/emscripten-core/emsdk.git
+        cd emsdk
+        ./emsdk install latest
+        ./emsdk activate latest
+        source ./emsdk_env.sh
+        cd ..
+
+        emconfigure ghcup install ghc --set javascript-unknown-ghcjs-9.6.2
         javascript-unknown-ghcjs-ghc --help
     - name: WASM
       run: |
+        git clone https://gitlab.haskell.org/ghc/ghc-wasm-meta.git
+        cd ghc-wasm-meta/
+        export SKIP_GHC=yes
+        sh setup.sh
+        source ~/.ghc-wasm/env
+        cd ..
+
         ghcup install ghc wasm32-wasi-9.8.0.20230927
         wasm32-wasi-ghc --help
