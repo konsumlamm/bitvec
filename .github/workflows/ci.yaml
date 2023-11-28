@@ -9,8 +9,6 @@ defaults:
 jobs:
   cross:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
     steps:
     - uses: actions/checkout@v3
     - name: Setup GHCup cross
@@ -25,6 +23,7 @@ jobs:
         source ./emsdk_env.sh
         cd ..
 
+        ghcup install --set ghc 9.6.2
         emconfigure ghcup install ghc --set javascript-unknown-ghcjs-9.6.2
         cabal build --with-compiler=javascript-unknown-ghcjs-ghc
     - name: WASM
