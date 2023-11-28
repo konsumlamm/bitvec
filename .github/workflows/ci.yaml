@@ -26,7 +26,7 @@ jobs:
         cd ..
 
         emconfigure ghcup install ghc --set javascript-unknown-ghcjs-9.6.2
-        javascript-unknown-ghcjs-ghc --help
+        ghc --help
     - name: WASM
       run: |
         git clone https://gitlab.haskell.org/ghc/ghc-wasm-meta.git
@@ -37,4 +37,4 @@ jobs:
         cd ..
 
         ghcup install ghc wasm32-wasi-9.8.0.20230927
-        wasm32-wasi-ghc --help
+        ghc --help
