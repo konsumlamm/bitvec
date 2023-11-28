@@ -1,0 +1,23 @@
+name: ci
+on:
+  push:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  cross:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+    - uses: actions/checkout@v3
+    - uses: haskell/actions/setup@v2
+    - name: Setup cross GHC
+      run: |
+        ghcup --version
+        ghcup config add-release-channel https://raw.githubusercontent.com/haskell/ghcup-metadata/develop/ghcup-cross-0.0.8.yaml
+    - name: Build
+      run: |
+        cabal build
