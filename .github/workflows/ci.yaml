@@ -35,5 +35,5 @@ jobs:
         source ~/.ghc-wasm/env
         cd ..
 
-        ghcup install ghc --set wasm32-wasi-9.6.3.20230927 -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
+        ghcup install ghc --set wasm32-wasi-9.8.0.20230927 -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
         cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg build
