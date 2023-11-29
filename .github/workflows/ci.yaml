@@ -25,7 +25,8 @@ jobs:
         cd ..
 
         emconfigure ghcup install ghc --set javascript-unknown-ghcjs-9.6.2
-        cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg test --test-show-details=direct
+        cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg test --enable-tests --test-show-details=direct
+        cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg test -f-simd --enable-tests --test-show-details=direct
     - name: WASM
       run: |
         git clone https://gitlab.haskell.org/ghc/ghc-wasm-meta.git
@@ -36,4 +37,5 @@ jobs:
         cd ..
 
         ghcup install ghc --set wasm32-wasi-9.8.0.20230927 -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
-        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg test --test-show-details=direct
+        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg test --enable-tests --test-show-details=direct
+        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg test -f-simd --enable-tests --test-show-details=direct
