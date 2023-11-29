@@ -26,7 +26,6 @@ jobs:
         emconfigure ghcup install ghc --set javascript-unknown-ghcjs-9.6.2
     - name: Run tests
       run: |
-        cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg test --enable-tests --test-show-details=direct
         cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg test -f-simd --enable-tests --test-show-details=direct
 
   wasm:
@@ -48,5 +47,4 @@ jobs:
         ghcup install ghc --set wasm32-wasi-9.8.0.20230927 -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
     - name: Run tests
       run: |
-        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg test --enable-tests --test-show-details=direct
         cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg test -f-simd --enable-tests --test-show-details=direct
