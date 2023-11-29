@@ -14,7 +14,6 @@ jobs:
     - name: Setup GHCup cross
       run: |
         ghcup config add-release-channel https://raw.githubusercontent.com/haskell/ghcup-metadata/develop/ghcup-cross-0.0.8.yaml
-        cabal update
     - name: JS
       run: |
         git clone https://github.com/emscripten-core/emsdk.git
