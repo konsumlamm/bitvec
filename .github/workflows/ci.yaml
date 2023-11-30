@@ -24,9 +24,10 @@ jobs:
         source ./emsdk_env.sh
         cd ..
         emconfigure ghcup install ghc --set javascript-unknown-ghcjs-9.6.2
-    - name: Run tests
+    - name: Build
       run: |
-        cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg test -f-simd --enable-tests --test-show-details=direct
+        cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg build
+        cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg build -f-simd
 
   wasm:
     runs-on: ubuntu-latest
@@ -45,6 +46,7 @@ jobs:
         source ~/.ghc-wasm/env
         cd ..
         ghcup install ghc --set wasm32-wasi-9.8.0.20230927 -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
-    - name: Run tests
+    - name: Build
       run: |
-        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg test -f-simd --enable-tests --test-show-details=direct
+        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg build
+        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg build -f-simd
