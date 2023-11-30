@@ -20,7 +20,7 @@ jobs:
         path: |
           ~/.cabal/store
           dist-newstyle
-        key: "$version"
+        key: ${{ env.version }}
     - name: Setup
       run: |
         ghcup config add-release-channel https://raw.githubusercontent.com/haskell/ghcup-metadata/develop/ghcup-cross-0.0.8.yaml
@@ -33,7 +33,7 @@ jobs:
         ./emsdk activate latest
         source ./emsdk_env.sh
         cd ..
-        emconfigure ghcup install ghc --set $version
+        emconfigure ghcup install ghc --set ${{ env.version }}
     - name: Build
       run: |
         cabal --with-compiler=javascript-unknown-ghcjs-ghc --with-hc-pkg=javascript-unknown-ghcjs-ghc-pkg build
@@ -50,7 +50,7 @@ jobs:
         path: |
           ~/.cabal/store
           dist-newstyle
-        key: "$version"
+        key: ${{ env.version }}
     - name: Setup
       run: |
         ghcup config add-release-channel https://raw.githubusercontent.com/haskell/ghcup-metadata/develop/ghcup-cross-0.0.8.yaml
@@ -63,7 +63,7 @@ jobs:
         ./setup.sh
         source ~/.ghc-wasm/env
         cd ..
-        ghcup install ghc --set $version -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
+        ghcup install ghc --set ${{ env.version }} -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
     - name: Build
       run: |
         cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg build
