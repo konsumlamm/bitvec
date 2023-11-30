@@ -98,7 +98,7 @@ library
   else
     build-depends: ghc-bignum
 
-  if flag(simd) && !arch(javascript) && !arch(wasm32)
+  if flag(simd)
     c-sources: cbits/bitvec_simd.c
     cc-options: -fopenmp-simd
     cpp-options: -DUseSIMD
