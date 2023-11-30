@@ -20,6 +20,7 @@ jobs:
         path: |
           ~/.cabal/store
           dist-newstyle
+          lol
         key: ${{ env.version }}
     - name: Setup
       run: |
@@ -50,6 +51,7 @@ jobs:
         path: |
           ~/.cabal/store
           dist-newstyle
+          rip
         key: ${{ env.version }}
     - name: Setup
       run: |
