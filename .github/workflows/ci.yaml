@@ -1,8 +1,6 @@
 name: ci
 on:
-  push:
-    branches:
-      - master
+  push: {}
   pull_request: {}
 
 defaults:
@@ -154,7 +152,11 @@ jobs:
         ghcup install ghc --set ${{ env.version }} -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
     - name: Build
       run: |
-        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg build
+        echo packages:. > cabal.project
+        echo tests:True >> cabal.project
+        echo "constraints:quickcheck-classes -semigroupoids -aeson -semirings" >> cabal.project
+        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg test --test-show-details=direct
+        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg test -f-simd --test-show-details=direct
 
   bounds-checking:
     needs: build
