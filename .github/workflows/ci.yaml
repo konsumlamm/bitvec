@@ -31,6 +31,7 @@ jobs:
         cd ghc-wasm-meta/
         export SKIP_GHC=yes
         ./setup.sh
+        cat ~/.ghc-wasm/env
         ls ~/.ghc-wasm/wasm32-wasi-cabal/bin
         source ~/.ghc-wasm/env
         cd ..
