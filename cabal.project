@@ -1,0 +1,2 @@
+constraints: quickcheck-classes -aeson -semigroupoids -semirings
+tests: True
