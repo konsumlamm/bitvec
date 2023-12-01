@@ -1,2 +1,5 @@
-constraints: quickcheck-classes -aeson -semigroupoids -semirings
+packages: .
 tests: True
+
+package quickcheck-classes
+    flags: -aeson -semigroupoids -semirings
