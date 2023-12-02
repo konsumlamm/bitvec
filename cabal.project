@@ -1,5 +1,4 @@
 packages: .
-tests: True
 
 package quickcheck-classes
     flags: -aeson -semigroupoids -semirings
