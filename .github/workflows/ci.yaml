@@ -31,6 +31,7 @@ jobs:
         cd ghc-wasm-meta/
         export SKIP_GHC=yes
         ./setup.sh
+        ls ~/.ghc-wasm/wasmtime/bin
         source ~/.ghc-wasm/env
         cd ..
         ghcup install ghc --set ${{ env.version }} -- --host=x86_64-linux --with-intree-gmp --with-system-libffi
