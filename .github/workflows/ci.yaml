@@ -31,6 +31,6 @@ jobs:
     - name: Build
       run: |
         mv cabal.project.wasi cabal.project.local
-        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg build
-        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg list-bin test:bitvec-tests --enable-tests
+        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg build --enable-tests
+        cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg list-bin test:bitvec-tests
         wasmtime $(cabal --with-compiler=wasm32-wasi-ghc --with-hc-pkg=wasm32-wasi-ghc-pkg list-bin test:bitvec-tests --enable-tests)
