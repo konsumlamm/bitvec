@@ -14,13 +14,6 @@ jobs:
       version: wasm32-wasi-9.8.0.20230927
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/cache@v3
-      name: Cache cabal stuff
-      with:
-        path: |
-          ~/.cabal/store
-          dist-newstyle
-        key: ${{ env.version }}
     - name: Setup
       run: |
         ghcup config add-release-channel https://raw.githubusercontent.com/haskell/ghcup-metadata/develop/ghcup-cross-0.0.8.yaml
